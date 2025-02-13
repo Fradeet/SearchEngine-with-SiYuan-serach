@@ -85,6 +85,7 @@
             -webkit-box-orient: vertical; 
             -webkit-line-clamp: 2; /* 设置你想要的行数 */
             overflow: hidden;
+            margin-bottom: 0.5em;
         }
             
         .siyuan-hpath {
@@ -97,7 +98,6 @@
             direction: rtl; /* 文本从右到左排列 */
             text-align: left; /* 将文本对齐方式设置为左对齐 */
             font-size: 0.8em;
-            margin-top: 0.5em;
         }
 
         #siyuan-search-header img {
@@ -276,8 +276,7 @@
                                         <div class="siyuan-search-title">${e.content}</div>
                                         </a>
                                         <div class="siyuan-search-info">
-                                            <div class="siyuan-hpath">${e.hpath}</div>
-                                            <div class="siyuan-updated">时间</div>
+                                            <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
                                         </div>`;
                                         title_ul.appendChild(li);
                                     } else {
