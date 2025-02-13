@@ -1,3 +1,17 @@
+// ==UserScript==
+// @name         在必应中搜索思源
+// @namespace    https://fradeet.top/
+// @version      2025-02-12
+// @description  在搜索引擎侧栏（目前是必应）展示相同的关键词在思源笔记中的结果。
+// @author       Fradeet
+// @match        https://*.bing.com/search*
+// @connect      127.0.0.1
+// @connect      *
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_xmlhttpRequest
+// ==/UserScript==
+
 (function () {
     'use strict';
 
