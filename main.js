@@ -42,16 +42,16 @@
             margin-bottom: 0.5em;
         }
         
-        #siyuan-search-list li:hover {
+        #siyuan-search li:hover {
             background-color: #f5f5f5;
         }
             
-        #siyuan-search-list li a {
+        #siyuan-search li a {
             text-decoration: none;
             color: #0078d7;
         }
             
-        #siyuan-search-list li a:hover {
+        #siyuan-search li a:hover {
             text-decoration: underline;
         }
             
@@ -61,28 +61,6 @@
             
         #setting-button {
             margin-left: 1em;
-        }
-            
-        #save-button {
-        }
-        #siyuan-search-list li a:visited {
-            color: #0078d7;
-        }
-            
-        #siyuan-search-list li a:active {
-            color: #0078d7;
-        }
-            
-        #siyuan-search-list li a:focus {
-            color: #0078d7;
-        }
-            
-        #siyuan-search-list li a:link {
-            color: #0078d7;
-        }
-            
-        #siyuan-search-list li a:hover {
-            color: #0078d7;
         }
 
         .siyuan-search-info {
@@ -165,6 +143,11 @@
             <ul id="siyuan-search-list">
 
             </ul>
+            <hr />            
+            <div>可能相关的笔记:</div>
+            <ul id="siyuan-related-list">
+
+            </ul>
         </div>
         <div id="bottom-panel">
             
@@ -175,7 +158,8 @@
     const sidePanel = document.getElementById("b_context");
     sidePanel.insertBefore(li, sidePanel.firstChild);
 
-    let ul = document.querySelector("#siyuan-search-list")
+    const title_ul = document.querySelector("#siyuan-search-list")
+    const related_ul = document.querySelector("#siyuan-related-list")
 
     let setting_button = document.getElementById("setting-button");
     let setting = document.querySelector("#siyuan-setting");
@@ -295,7 +279,7 @@
                                             <div class="siyuan-hpath">${e.hpath}</div>
                                             <div class="siyuan-updated">时间</div>
                                         </div>`;
-                                        ul.appendChild(li);
+                                        title_ul.appendChild(li);
                                     } else {
                                         if (note_list.includes(e.root_id) === false && block_list.includes(e.root_id) === false) {
                                             // 获取块的笔记名字
@@ -317,7 +301,7 @@
                                                         li.innerHTML = `<a href="${config.SiYuan.Endpoint}?id=${e.root_id}&focus=true" target="_blank">
                                                         <div>${res.response.data.title}</div>
                                                         </a>`;
-                                                        ul.appendChild(li);
+                                                        related_ul.appendChild(li);
 
                                                     }
                                                 },
