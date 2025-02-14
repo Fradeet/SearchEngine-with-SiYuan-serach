@@ -155,10 +155,11 @@
             <ul id="siyuan-search-list">
 
             </ul>
-            <hr />            
-            <div style="margin-bottom: 1em;">可能相关的笔记:</div>
+            <div id="middle-line">
+                <hr />
+                <div style="margin-bottom: 1em;">可能相关的笔记:</div>
+            </div>
             <ul id="siyuan-related-list">
-
             </ul>
         </div>
         <div id="bottom-panel">
@@ -178,8 +179,6 @@
     setting_button.onclick = () => {
         setting.style.display = 'inline';
     }
-
-    // TODO 捐赠
 
     // 将现有配置填入
     if (config?.SiYuan !== undefined) {
@@ -224,6 +223,11 @@
         }, 2000);
     }
 
+    const ErrorPage = (code) => {
+        document.getElementById("middle-line").style.display = 'none';
+        title_ul.appendChild(document.createTextNode(`连接 SiYuan 失败。${code ? `错误码: ${code}` : ''}`));
+    }
+
     if (config?.SiYuan?.Token !== undefined) {
         console.log("[SiYuan Search] CheckConnect");
         GM_xmlhttpRequest({
@@ -236,13 +240,6 @@
 
                     // 获取搜索框内容
                     const searchInput = document.getElementById("sb_form_q").value;
-
-                    const sql1 = `SELECT id, content 
-                                FROM blocks 
-                                WHERE content 
-                                LIKE '%${searchInput}%' 
-                                AND root_id='' 
-                                ORDER BY updated`
 
                     // 可显示笔记块
                     const sql2 = `SELECT id, content, hpath, updated, root_id
@@ -284,17 +281,17 @@
                                             <div class="siyuan-search-title">${e.content}</div>
                                             </a>
                                             <div class="siyuan-search-info">
-                                                <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
+                                                <div class="siyuan-updated">时间：${e.updated.substring(0, 8)}</div>
                                             </div>`;
                                         } else if (config.Location === "remote") {
                                             li.innerHTML = `<a href="${config.SiYuan.Endpoint}?id=${e.root_id}&focus=true" target="_blank">
                                             <div class="siyuan-search-title">${e.content}</div>
                                             </a>
                                             <div class="siyuan-search-info">
-                                                <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
+                                                <div class="siyuan-updated">时间：${e.updated.substring(0, 8)}</div>
                                             </div>`;
                                         }
-                                        
+
                                         title_ul.appendChild(li);
                                     } else {
                                         if (note_list.includes(e.root_id) === false && block_list.includes(e.root_id) === false) {
@@ -330,6 +327,7 @@
                                 });
                             } else {
                                 console.error("[SiYuan Search] Response issue: ", res);
+                                ErrorPage(res.response.code);
                             }
                         },
                         onerror: function () {
@@ -338,12 +336,12 @@
                     });
                 } else {
                     console.error("[SiYuan Search] Response issue: ", res);
-
+                    ErrorPage(res.response.code);
                 }
             },
             onerror: function () {
                 console.error("[SiYuan Search] Connect failed.");
-
+                ErrorPage();
             }
         });
     } else {
