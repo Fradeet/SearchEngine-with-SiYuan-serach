@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         在必应中搜索思源
+// @name         在必应（Bing）中搜索思源（SiYuan）
 // @namespace    https://fradeet.top/
 // @supportURL   https://github.com/Fradeet/SearchEngine-with-SiYuan-serach
 // @version      2025-02-14
@@ -22,13 +22,13 @@
 
     // 获取本地存储配置
     // console.log("GM_getValue", GM_getValue("config"));
-    let config = JSON.parse(GM_getValue("config", {
-        Location: "local",
-        SiYuan: {
-            Endpoint: "http://127.0.0.1:6806/",
-            Token: undefined
+    let config = JSON.parse(GM_getValue("config", `{
+        "Location": "local",
+        "SiYuan": {
+            "Endpoint": "http://127.0.0.1:6806/",
+            "Token": ""
         }
-    }));
+    }`));
 
     // 插入样式
     const style = document.createElement('style');
@@ -230,7 +230,7 @@
         title_ul.appendChild(document.createTextNode(`连接 SiYuan 失败。${code ? `错误码: ${code}` : ''}`));
     }
 
-    if (config.SiYuan.Token !== undefined) {
+    if (config.SiYuan.Token !== "") {
         console.log("[SiYuan Search] CheckConnect");
         GM_xmlhttpRequest({
             method: 'POST',
@@ -345,5 +345,7 @@
         console.log("[SiYuan Search] Please configure the connection information.");
         // 展开设置页面
         setting.style.display = 'inline';
+        document.getElementById("middle-line").style.display = 'none';
+        title_ul.appendChild(document.createTextNode(`请先登录。`));
     }
 })();
