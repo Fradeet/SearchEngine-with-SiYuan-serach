@@ -5,6 +5,7 @@
 // @version      2025-02-14
 // @description  在搜索引擎侧栏（目前是必应）展示相同的关键词在思源笔记中的结果。
 // @author       Fradeet
+// @license      MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==
 // @match        https://*.bing.com/search*
 // @connect      127.0.0.1
@@ -182,7 +183,7 @@
     }
 
     // 将现有配置填入
-    if (config?.SiYuan !== undefined) {
+    if (config.SiYuan !== undefined) {
         if (config.Location === "local") {
             document.getElementById("location").value = "local";
             document.getElementById("url").disabled = true;
@@ -229,7 +230,7 @@
         title_ul.appendChild(document.createTextNode(`连接 SiYuan 失败。${code ? `错误码: ${code}` : ''}`));
     }
 
-    if (config?.SiYuan?.Token !== undefined) {
+    if (config.SiYuan.Token !== undefined) {
         console.log("[SiYuan Search] CheckConnect");
         GM_xmlhttpRequest({
             method: 'POST',
