@@ -101,9 +101,19 @@
         }
 
         #siyuan-search-header img {
-            width: 1em;
-            height: 1em;
+            width: 2em;
+            height: 2em;
+            align-items: center; /* 垂直居中 */
+
         }         
+        
+        #siyuan-search-header div {
+            align-items: center; /* 垂直居中 */
+        }
+
+        #siyuan-related-list li {
+            margin-bottom: 0.5em;
+        }
         `;
     document.head.appendChild(style);
 
@@ -114,7 +124,9 @@
     const onStartPage = `
         <div id="siyuan-search-header" style="display: flex;">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==" alt="SiYuan"></img>
-            <div>SiYuan 搜索</div>
+            <div style="display: flex;">
+                <div>SiYuan 搜索</div>
+            </div>
             <div style="margin-left: auto; display: flex;">
                 <div id="donate-button">
                     <a href="https://afdian.com/a/fradeet" target="_blank">
@@ -144,7 +156,7 @@
 
             </ul>
             <hr />            
-            <div>可能相关的笔记:</div>
+            <div style="margin-bottom: 1em;">可能相关的笔记:</div>
             <ul id="siyuan-related-list">
 
             </ul>
@@ -173,6 +185,7 @@
     if (config?.SiYuan !== undefined) {
         if (config.Location === "local") {
             document.getElementById("location").value = "local";
+            document.getElementById("url").disabled = true;
         } else {
             document.getElementById("location").value = "remote";
         }
@@ -181,15 +194,7 @@
     }
 
     // TODO 选择远程的时候弹出提示，提示可能需要 Tampermonkey 允许跨域
-    document.getElementById("location").onchange = () => {
-        if (document.getElementById("location").value === "remote") {
-            document.getElementById("setting-log").innerHTML = `
-                <div style="color: red;">稍后 Tampermonkey 可能会弹出请求以允许跨域，请选择允许。</div>
-            `;
-        } else {
-            document.getElementById("setting-log").innerHTML = '';
-        }
-    }
+
 
     // 监听设置，如果是本地则服务器输入框禁用
     document.getElementById("location").onchange = () => {
@@ -204,7 +209,7 @@
         let location = document.getElementById("location").value;
         if (location === "local") {
             config.Location = "local";
-            config.SiYuan.Endpoint = "http://127.0.0.1:6806/";
+            config.SiYuan.Endpoint = "http://127.0.0.1:6806";
         } else {
             config.Location = "remote";
             config.SiYuan.Endpoint = document.getElementById("url").value;
@@ -269,15 +274,27 @@
                                 // 渲染页面
                                 res.response.data.forEach((e) => {
                                     let li = document.createElement('li');
+                                    // 判断是否文档块
                                     if (e.root_id === e.id) {
                                         li.classList.add('siyuan-search-item');
                                         note_list.push(e.root_id);
-                                        li.innerHTML = `<a href="${config.SiYuan.Endpoint}?id=${e.root_id}&focus=true" target="_blank">
-                                        <div class="siyuan-search-title">${e.content}</div>
-                                        </a>
-                                        <div class="siyuan-search-info">
-                                            <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
-                                        </div>`;
+
+                                        if (config.Location === "local") {
+                                            li.innerHTML = `<a href="siyuan://blocks/${e.root_id}" target="_blank">
+                                            <div class="siyuan-search-title">${e.content}</div>
+                                            </a>
+                                            <div class="siyuan-search-info">
+                                                <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
+                                            </div>`;
+                                        } else if (config.Location === "remote") {
+                                            li.innerHTML = `<a href="${config.SiYuan.Endpoint}?id=${e.root_id}&focus=true" target="_blank">
+                                            <div class="siyuan-search-title">${e.content}</div>
+                                            </a>
+                                            <div class="siyuan-search-info">
+                                                <div class="siyuan-updated">时间：${e.updated.substring(0,8)}</div>
+                                            </div>`;
+                                        }
+                                        
                                         title_ul.appendChild(li);
                                     } else {
                                         if (note_list.includes(e.root_id) === false && block_list.includes(e.root_id) === false) {
