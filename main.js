@@ -15,10 +15,10 @@
 (function () {
     'use strict';
 
-    console.log("GM_info", GM_info);
+    // console.log("GM_info", GM_info);
 
     // 获取本地存储配置
-    console.log("GM_getValue", GM_getValue("config"));
+    // console.log("GM_getValue", GM_getValue("config"));
     let config = JSON.parse(GM_getValue("config", {
         Location: "local",
         SiYuan: {
@@ -121,7 +121,7 @@
     let li = document.createElement('li');
     li.style.cssText = 'margin-bottom: 2em;';
 
-    const onStartPage = `
+    li.innerHTML = `
         <div id="siyuan-search-header" style="display: flex;">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==" alt="SiYuan"></img>
             <div style="display: flex;">
@@ -165,9 +165,8 @@
         <div id="bottom-panel">
             
         </div>
-    `
-    li.innerHTML = onStartPage;
-
+    `;
+    
     const sidePanel = document.getElementById("b_context");
     sidePanel.insertBefore(li, sidePanel.firstChild);
 
@@ -251,7 +250,7 @@
                                 updated DESC;`
 
                     // SQL 搜索
-                    const result = GM_xmlhttpRequest({
+                    GM_xmlhttpRequest({
                         method: 'POST',
                         url: config.SiYuan.Endpoint + '/api/query/sql',
                         data: JSON.stringify({
@@ -275,7 +274,6 @@
                                     if (e.root_id === e.id) {
                                         li.classList.add('siyuan-search-item');
                                         note_list.push(e.root_id);
-
                                         if (config.Location === "local") {
                                             li.innerHTML = `<a href="siyuan://blocks/${e.root_id}" target="_blank">
                                             <div class="siyuan-search-title">${e.content}</div>
@@ -291,7 +289,6 @@
                                                 <div class="siyuan-updated">时间：${e.updated.substring(0, 8)}</div>
                                             </div>`;
                                         }
-
                                         title_ul.appendChild(li);
                                     } else {
                                         if (note_list.includes(e.root_id) === false && block_list.includes(e.root_id) === false) {
@@ -308,8 +305,6 @@
                                                 responseType: 'json',
                                                 onload: function (res) {
                                                     if (res.status === 200 && res.response.code === 0) {
-
-                                                        // console.log("render...");
                                                         // 渲染到页面
                                                         li.innerHTML = `<a href="${config.SiYuan.Endpoint}?id=${e.root_id}&focus=true" target="_blank">
                                                         <div>${res.response.data.title}</div>
@@ -323,7 +318,6 @@
                                             block_list.push(e.root_id);
                                         }
                                     }
-
                                 });
                             } else {
                                 console.error("[SiYuan Search] Response issue: ", res);
@@ -349,7 +343,4 @@
         // 展开设置页面
         setting.style.display = 'inline';
     }
-
-
-
 })();
