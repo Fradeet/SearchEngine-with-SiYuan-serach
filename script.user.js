@@ -129,6 +129,10 @@
         #siyuan-related-list li {
             margin-bottom: 0.5em;
         }
+
+        .siyuan-search-sidepanel {
+            grid-column: span 7/-2;
+        }
         `;
     document.head.appendChild(style);
 
@@ -194,6 +198,16 @@
         sidePanel.insertBefore(body, sidePanel.firstChild);
 
     } else if (currentDomain.includes('google')) {
+        
+        // 检测是否创建了侧栏
+        if (document.getElementById("rhs") === null) {
+            const sidePanel = document.createElement("div");
+            sidePanel.id = "rhs";
+
+            sidePanel.classList.add("siyuan-search-sidepanel");
+
+            document.getElementById("center_col").parentElement.appendChild(sidePanel);
+        }
         let body = document.createElement('div');
         body.style.cssText = 'margin-bottom: 2em;';
 
