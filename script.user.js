@@ -278,18 +278,20 @@
 
     if (config.SiYuan.Token !== "") {
         console.log("[SiYuan Search] CheckConnect");
+        const checkUrl = new URL('/api/system/version', config.SiYuan.Endpoint);
         GM_xmlhttpRequest({
             method: 'POST',
-            url: config.SiYuan.Endpoint + '/api/system/version',
+            url: checkUrl.href,
             responseType: 'json',
             onload: function (res) {
                 if (res.status == 200 && res.response.code === 0) {
                     console.log("[SiYuan Search] Connect success, SiYuan version: ", res.response.data);
 
+                    const sqlUrl = new URL('/api/query/sql', config.SiYuan.Endpoint);
                     // SQL 搜索
                     GM_xmlhttpRequest({
                         method: 'POST',
-                        url: config.SiYuan.Endpoint + '/api/query/sql',
+                        url: sqlUrl.href,
                         data: JSON.stringify({
                             "stmt": `SELECT id, content, hpath, updated, root_id
                                 FROM blocks 
@@ -335,10 +337,12 @@
                                         title_ul.appendChild(li);
                                     } else {
                                         if (note_list.includes(e.root_id) === false && block_list.includes(e.root_id) === false) {
+                                            const attrUrl = new URL('/api/attr/getBlockAttrs', config.SiYuan.Endpoint);
+
                                             // 获取块的笔记名字
                                             GM_xmlhttpRequest({
                                                 method: 'POST',
-                                                url: config.SiYuan.Endpoint + '/api/attr/getBlockAttrs',
+                                                url: attrUrl.href,
                                                 data: JSON.stringify({
                                                     "id": e.root_id,
                                                 }),
