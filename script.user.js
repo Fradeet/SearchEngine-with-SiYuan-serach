@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         在搜索引擎中搜索思源（SiYuan）
+// @name         在搜索引擎中搜索思源笔记（SiYuan）
 // @namespace    https://fradeet.top/
 // @supportURL   https://github.com/Fradeet/SearchEngine-with-SiYuan-serach
 // @version      2025-02-14
