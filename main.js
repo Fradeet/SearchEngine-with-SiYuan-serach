@@ -3,11 +3,13 @@
 // @namespace    https://fradeet.top/
 // @supportURL   https://github.com/Fradeet/SearchEngine-with-SiYuan-serach
 // @version      2025-02-14
-// @description  在搜索引擎侧栏（目前是必应）展示相同的关键词在思源笔记中的结果。
+// @description:zh 在搜索引擎侧栏展示相同的关键词在思源笔记中的结果。
+// @description  Display results for the same keywords in the SiYuan Note in the search engine sidebar.
 // @author       Fradeet
 // @license      MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==
 // @match        https://*.bing.com/search*
+// @include      https://www.google.*/search?*
 // @connect      127.0.0.1
 // @connect      *
 // @grant        GM_setValue
@@ -19,6 +21,11 @@
     'use strict';
 
     // console.log("GM_info", GM_info);
+    // console.log("Window", window.location.href);
+    // GM_getTab((tab) => console.log("Get Tab", tab));
+
+    const currentURL = window.location.href;
+    const currentDomain = currentURL.split('?')[0];
 
     // 获取本地存储配置
     // console.log("GM_getValue", GM_getValue("config"));
@@ -57,7 +64,11 @@
         #siyuan-search li a:hover {
             text-decoration: underline;
         }
-            
+         
+        #siyuan-search ul {
+            list-style-type: none;
+        }
+
         #donate-button {
             margin-left: 1em;
         }
@@ -68,6 +79,7 @@
 
         .siyuan-search-info {
             display: flex;
+            color: #71777d
         }
 
         .siyuan-updated {
@@ -120,58 +132,78 @@
         `;
     document.head.appendChild(style);
 
-    // 创建一个 li
-    let li = document.createElement('li');
-    li.style.cssText = 'margin-bottom: 2em;';
-
-    li.innerHTML = `
-        <div id="siyuan-search-header" style="display: flex;">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==" alt="SiYuan"></img>
-            <div style="display: flex;">
-                <div>SiYuan 搜索</div>
-            </div>
-            <div style="margin-left: auto; display: flex;">
-                <div id="donate-button">
-                    <a href="https://afdian.com/a/fradeet" target="_blank">
-                        ❤️
-                    </a>
+    const bodyHTML = `
+            <div id="siyuan-search-header" style="display: flex;">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFJSURBVDhPxZJPTsJAFMbntbXRA+iKhUESPQGmJaQB45pdwxE4gXHLMWTnlkQCBxDSQAobL6DEpNFNw86NyYh9vvnT2gqJxg2/zXvv63zfTKdlO8fUNeOxWi3x45Pzh5foWUuSu1rtMi6XeRRFb1qSGLpKhBlNcxKDNXDrFy0tsyfXbR0lOFgn1sTzvJKWJaBrZiahcmXt8xUAQwT/9vOdKvZjWnq9d2AzZEvLWDeCIHgVPnmCvFnMCrABsC/MNNhKI4BV8ieRAWgY3aI5BYTx25xCIR+J2RWtCgDYuMxfAfUBCpf4H7YG0OugbvNs0zYDEsTeCqFNLVeKhB8ybNOF9vScUQgQ5tPFojObjYeIzKdNRQhPAPyz+XwYTsednyFZQGpOjx9O70fiP5DmMBzJRfRMhjB2o2fF0nGaJJL3z4BTbzR1v1MY+wIHyIJUp2H/PgAAAABJRU5ErkJggg==" alt="SiYuan"></img>
+                <div style="display: flex;">
+                    <div>SiYuan 搜索</div>
                 </div>
-                <button id="setting-button">
-                    设置
-                </button>
+                <div style="margin-left: auto; display: flex;">
+                    <div id="donate-button">
+                        <a href="https://afdian.com/a/fradeet" target="_blank">
+                            ❤️
+                        </a>
+                    </div>
+                    <button id="setting-button">
+                        设置
+                    </button>
+                </div>
             </div>
-        </div>
-        <div style="display: none;" id="siyuan-setting">
-            <label>思源笔记位置:</label>
-            <select id="location" name="location">
-                <option value="local">本地</option>
-                <option value="remote">远程</option>
-            </select>
-            <label for="url">地址:</label>
-            <input type="text" id="url" name="url" required>
-            <label for="token">Token:</label>
-            <input type="password" id="token" name="token" required>
-            <div id="setting-log" style="margin-top: 1em;"></div>
-            <button id="save-button">保存</button>
-        </div>
-        <div id="siyuan-search">
-            <ul id="siyuan-search-list">
+            <div style="display: none;" id="siyuan-setting">
+                <label>思源笔记位置:</label>
+                <select id="location" name="location">
+                    <option value="local">本地</option>
+                    <option value="remote">远程</option>
+                </select>
+                <br>
+                <label for="url">地址:</label>
+                <input type="text" id="url" name="url" required>
+                <br>
+                <label for="token">Token:</label>
+                <input type="password" id="token" name="token" required>
+                <br>
+                <div id="setting-log" style="margin-top: 1em;"></div>
+                <button id="save-button">保存</button>
+            </div>
+            <div id="siyuan-search">
+                <ul id="siyuan-search-list">
+                </ul>
+                <div id="middle-line">
+                    <hr />
+                    <div style="margin-bottom: 1em;">可能相关的笔记:</div>
+                </div>
+                <ul id="siyuan-related-list">
+                </ul>
+            </div>
+            <div id="bottom-panel">
+            </div>
+            `;
 
-            </ul>
-            <div id="middle-line">
-                <hr />
-                <div style="margin-bottom: 1em;">可能相关的笔记:</div>
-            </div>
-            <ul id="siyuan-related-list">
-            </ul>
-        </div>
-        <div id="bottom-panel">
-            
-        </div>
-    `;
+    // 从 URL 获取搜索词
+    const searchInput = document.querySelector('[name="q"]').value;
+
+    // 判断是 bing 还是 google
+    if (currentDomain.includes('bing')) {
+        // 创建一个 li
+        let body = document.createElement('li');
+        body.style.cssText = 'margin-bottom: 2em;';
+
+        body.innerHTML = bodyHTML;
+        
+        const sidePanel = document.getElementById("b_context");
+        sidePanel.insertBefore(body, sidePanel.firstChild);
+
+    } else if (currentDomain.includes('google')) {
+        let body = document.createElement('div');
+        body.style.cssText = 'margin-bottom: 2em;';
+
+        body.innerHTML = bodyHTML;
+        
+        const sidePanel = document.getElementById("rhs");
+        sidePanel.insertBefore(body, sidePanel.firstChild);
+    }
+
     
-    const sidePanel = document.getElementById("b_context");
-    sidePanel.insertBefore(li, sidePanel.firstChild);
 
     const title_ul = document.querySelector("#siyuan-search-list")
     const related_ul = document.querySelector("#siyuan-related-list")
@@ -240,24 +272,18 @@
                 if (res.status == 200 && res.response.code === 0) {
                     console.log("[SiYuan Search] Connect success, SiYuan version: ", res.response.data);
 
-                    // 获取搜索框内容
-                    const searchInput = document.getElementById("sb_form_q").value;
-
-                    // 可显示笔记块
-                    const sql2 = `SELECT id, content, hpath, updated, root_id
+                    // SQL 搜索
+                    GM_xmlhttpRequest({
+                        method: 'POST',
+                        url: config.SiYuan.Endpoint + '/api/query/sql',
+                        data: JSON.stringify({
+                            "stmt": `SELECT id, content, hpath, updated, root_id
                                 FROM blocks 
                                 WHERE content
                                 LIKE '%${searchInput}%' 
                                 ORDER BY 
                                 sort ASC, 
                                 updated DESC;`
-
-                    // SQL 搜索
-                    GM_xmlhttpRequest({
-                        method: 'POST',
-                        url: config.SiYuan.Endpoint + '/api/query/sql',
-                        data: JSON.stringify({
-                            "stmt": sql2
                         }),
                         Headers: {
                             "Authorization": "Token " + config.SiYuan.Token
