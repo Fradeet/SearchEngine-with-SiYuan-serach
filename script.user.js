@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         在必应（Bing）中搜索思源（SiYuan）
+// @name         在搜索引擎中搜索思源（SiYuan）
 // @namespace    https://fradeet.top/
 // @supportURL   https://github.com/Fradeet/SearchEngine-with-SiYuan-serach
 // @version      2025-02-14
-// @description:zh 在搜索引擎侧栏展示相同的关键词在思源笔记中的结果。
+// @description:zh 在搜索引擎侧栏，必应（Bing）和谷歌（Google），展示相同的关键词在思源笔记中的结果。
 // @description  Display results for the same keywords in the SiYuan Note in the search engine sidebar.
 // @author       Fradeet
 // @license      MIT
