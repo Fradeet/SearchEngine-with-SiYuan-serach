@@ -166,7 +166,9 @@
                 <label for="token">Token:</label>
                 <input type="password" id="token" name="token" required>
                 <br>
-                <div id="setting-log" style="margin-top: 1em;"></div>
+                <div id="setting-log" style="margin-top: 1em;">
+                    若位置选择“远程”，可能需要同意跨域请求。
+                </div>
                 <button id="save-button">保存</button>
             </div>
             <div id="siyuan-search">
@@ -271,9 +273,29 @@
         }, 2000);
     }
 
-    const ErrorPage = (code) => {
+    const ErrorPage = (type, code, msg) => {
+        console.log("[SiYuan search] ErrorPage ", type, code, msg);
         document.getElementById("middle-line").style.display = 'none';
-        title_ul.appendChild(document.createTextNode(`连接 SiYuan 失败。${code ? `错误码: ${code}` : ''}`));
+        let error_message;
+        if (type === "SiYuan") {
+            error_message = `连接 SiYuan 失败。
+                            ${code ? `错误码: ${code}` : ''}
+                            ${msg ? `错误信息: ${msg}` : ''}`;
+        } else if (type === "GM") {
+            error_message = `GM_xmlhttpRequest 失败。
+                            ${code ? `错误码: ${code}` : ''}
+                            ${msg ? `错误信息: ${msg}` : ''}`;
+        } else if (type === "HTTP") {
+            error_message = `连接至 SiYuan HTTP 请求错误。
+                            ${code ? `错误码: ${code}` : ''}
+                            ${msg ? `错误信息: ${msg}` : ''}`;
+        } else {
+            error_message = `未知错误。
+                            ${code ? `错误码: ${code}` : ''}
+                            ${msg ? `错误信息: ${msg}` : ''}`;
+        }
+        title_ul.appendChild(document.createTextNode(error_message));
+        console.error("[SiYuan Scarch]: ", type, " ", error_message);
     }
 
     if (config.SiYuan.Token !== "") {
@@ -306,6 +328,7 @@
                         },
                         responseType: 'json',
                         onload: function (res) {
+                            console.log("[SiYuan Search] SQL Search ", res);
                             if (res.status === 200 && res.response.code === 0) {
                                 console.log(`[SiYuan Search] Search '${searchInput}' success, result: `, res.response.data);
                                 // 以标题成功匹配的列表
@@ -366,23 +389,26 @@
                                         }
                                     }
                                 });
+                            } else if (res.status !== 200) {
+                                ErrorPage("HTTP", res.status, res.response.msg);
                             } else {
-                                console.error("[SiYuan Search] Response issue: ", res);
-                                ErrorPage(res.response.code);
+                                console.error("[SiYuan Search] Check version issue: ", res);
+                                ErrorPage("SiYuan", res.response.code, res.response.msg);
                             }
                         },
                         onerror: function () {
                             console.error("[SiYuan Search] Search failed.");
+                            ErrorPage("GM");
                         }
                     });
                 } else {
                     console.error("[SiYuan Search] Response issue: ", res);
-                    ErrorPage(res.response.code);
+                    ErrorPage("SiYuan", res.response.code, res.response.msg);
                 }
             },
             onerror: function () {
                 console.error("[SiYuan Search] Connect failed.");
-                ErrorPage();
+                ErrorPage("GM");
             }
         });
     } else {
